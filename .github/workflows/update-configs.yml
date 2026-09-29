@@ -1,0 +1,27 @@
+jobs:
+  update-configs:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    - name: Install dependencies
+      run: pip install pyyaml requests
+    - name: Fetch and update configs
+      run: python update_configs.py
+    - name: Commit and push changes
+      run: "\n                    git config user.name \"github-actions[bot]\"\n \
+        \                   git config user.email \"41898282+github-actions[bot]@users.noreply.github.com\"\
+        \n                    git add configs.txt\n                    git diff --quiet\
+        \ && echo \"No changes to commit\" || (git commit -m \"Auto-update: Refresh\
+        \ proxy configs\" && git push)\n                "
+name: Update Proxy Configs
+'on':
+  schedule:
+  - cron: 0 */12 * * *
+  workflow_dispatch: {}
+permissions:
+  contents: write
